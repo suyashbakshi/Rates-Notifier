@@ -8,7 +8,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -21,7 +24,7 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
     ArrayList<String> mList;
     Context mContext;
 
-    public void addItem(String item){
+    public void addItem(String item) {
         mList.add(item);
     }
 
@@ -39,19 +42,22 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         String[] split = mList.get(position).split("/");
-        Log.v("Test_data",mList.get(position)+" "+split[0]+" "+split[1]+" "+split[2]+" "+split[3]+" "+split[4]+" ");
+        Log.v("Test_data", mList.get(position) + " " + split[0] + " " + split[1] + " " + split[2] + " " + split[3] + " " + split[4] + " ");
         holder.symbol_tv.setText(split[0]);
-        holder.bid_tv.setText("Bid: " +split[1]);
-        holder.ask_tv.setText("Ask: " +split[2]);
-        holder.high_tv.setText("High: " +split[3]);
+        holder.bid_tv.setText("Bid: " + split[1]);
+        holder.ask_tv.setText("Ask: " + split[2]);
+        holder.high_tv.setText("High: " + split[3]);
         holder.low_tv.setText("Low: " + split[4]);
 
-        if(Integer.parseInt(split[5]) == 1){
+        if (Integer.parseInt(split[5]) == 1) {
             holder.symbol_tv.setTextColor(Color.GREEN);
-        }else if(Integer.parseInt(split[5]) == -1){
+            holder.indicator_iv.setImageResource(R.drawable.green_arrow);
+        } else if (Integer.parseInt(split[5]) == -1) {
             holder.symbol_tv.setTextColor(Color.RED);
-        }else {
+            holder.indicator_iv.setImageResource(R.drawable.red_arrow);
+        } else {
             holder.symbol_tv.setTextColor(Color.DKGRAY);
+            holder.indicator_iv.setImageResource(0);
         }
     }
 
@@ -60,9 +66,15 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
         return mList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public void clear() {
+        mList.clear();
+    }
 
-        TextView symbol_tv,ask_tv,bid_tv,high_tv,low_tv;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        TextView symbol_tv, ask_tv, bid_tv, high_tv, low_tv;
+        ImageView indicator_iv;
+        LinearLayout layout;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -71,6 +83,16 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
             ask_tv = (TextView) itemView.findViewById(R.id.ask_tv);
             high_tv = (TextView) itemView.findViewById(R.id.high_tv);
             low_tv = (TextView) itemView.findViewById(R.id.low_tv);
+            indicator_iv = (ImageView) itemView.findViewById(R.id.indicator_iv);
+            layout = (LinearLayout) itemView.findViewById(R.id.container_layout);
+
+            layout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    Toast.makeText(mContext,"Long clicked " + mList.get(getAdapterPosition()),Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
         }
     }
 }
