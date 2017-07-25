@@ -6,20 +6,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -56,6 +49,9 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
     }
 
     private void convertXMLToUXFormat(MainListAdapter mAdapter, String xml) {
+
+
+
         String symbol = null, bid = null, ask = null, high = null, low = null, direction = null;
         StringBuilder builder;
         XmlPullParserFactory xmlFactoryObject = null;
