@@ -55,7 +55,9 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
         holder.bid_tv.setText("Bid: " + split[1]);
         holder.ask_tv.setText("Ask: " + split[2]);
         holder.high_tv.setText("High: " + split[3]);
+        holder.high_tv.setTextColor(Color.GREEN);
         holder.low_tv.setText("Low: " + split[4]);
+        holder.low_tv.setTextColor(Color.RED);
 
         if (Integer.parseInt(split[5]) == 1) {
             holder.symbol_tv.setTextColor(Color.GREEN);
@@ -64,7 +66,7 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
             holder.symbol_tv.setTextColor(Color.RED);
             holder.indicator_iv.setImageResource(R.drawable.red_arrow);
         } else {
-            holder.symbol_tv.setTextColor(Color.DKGRAY);
+            holder.symbol_tv.setTextColor(Color.WHITE);
             holder.indicator_iv.setImageResource(0);
         }
     }

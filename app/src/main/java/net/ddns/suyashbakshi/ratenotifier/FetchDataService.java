@@ -1,7 +1,11 @@
 package net.ddns.suyashbakshi.ratenotifier;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -50,8 +54,15 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
 
     private void convertXMLToUXFormat(MainListAdapter mAdapter, String xml) {
 
+        SharedPreferences preferences = mContext.getSharedPreferences(mContext.getString(R.string.fav_pref), Context.MODE_PRIVATE);
+        String savedPref = preferences.getString(mContext.getString(R.string.fav_pref), "");
 
-
+        String pref_symbol = null, target_bid = null;
+        if (!TextUtils.isEmpty(savedPref)) {
+            String[] split = savedPref.split("/");
+            pref_symbol = split[0];
+            target_bid = split[1];
+        }
         String symbol = null, bid = null, ask = null, high = null, low = null, direction = null;
         StringBuilder builder;
         XmlPullParserFactory xmlFactoryObject = null;
@@ -76,6 +87,29 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
                         } else if (myparser.getName().equalsIgnoreCase("Bid")) {
                             event = myparser.next();
                             bid = myparser.getText();
+
+                            if (symbol.equalsIgnoreCase(pref_symbol) && Double.valueOf(bid) >= Double.valueOf(target_bid)) {
+                                Log.v("Bid_check", "reached");
+                                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext);
+                                mBuilder.setSmallIcon(R.drawable.dollar);
+                                mBuilder.setContentTitle("Rates Notifier");
+                                mBuilder.setContentText("Your favorite stock has reached target bid!");
+                                mBuilder.setVibrate(new long[]{0, 100, 100, 100});
+                                mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+
+                                NotificationCompat.InboxStyle inboxStyle =
+                                        new NotificationCompat.InboxStyle();
+                                inboxStyle.setBigContentTitle("Rates Notifier");
+                                inboxStyle.setSummaryText("Your favorite stock has reached target bid!");
+                                inboxStyle.addLine(pref_symbol + "'s bid is now more than " + target_bid);
+                                mBuilder.setStyle(inboxStyle);
+
+                                NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                                // notificationID allows you to update the notification later on.
+                                mNotificationManager.notify(1, mBuilder.build());
+                            }
+
                         } else if (myparser.getName().equalsIgnoreCase("Ask")) {
                             event = myparser.next();
                             ask = myparser.getText();
@@ -121,12 +155,14 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 
     @Override
     protected String doInBackground(Void... voids) {
 
-        if(mAdapter!=null){
+        if (mAdapter != null) {
             mAdapter.clear();
         }
 

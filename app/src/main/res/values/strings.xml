@@ -6,4 +6,10 @@
     <string name="fav_pref">favorite_preference</string>
     <string name="snackbar_message">Press and hold on item to set target bid</string>
     <string name="data_refresh_msg">Refreshed Data</string>
+    <string name="clear_my_bid">Clear my bid</string>
+    <string name="clear_preference">Bid preference cleared</string>
+    <string name="refresh_rate_text">Refresh rate set for 60 seconds</string>
+    <string name="show_my_bid">Show my bid</string>
+    <string name="no_bid_set">No target bid set</string>
+    <string name="no_internet">Uh oh! No internet...</string>
 </resources>
