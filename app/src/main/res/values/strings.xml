@@ -12,4 +12,5 @@
     <string name="show_my_bid">Show my bid</string>
     <string name="no_bid_set">No target bid set</string>
     <string name="no_internet">Uh oh! No internet...</string>
+    <string name="target_reached">Your favorite stock has reached target bid!</string>
 </resources>

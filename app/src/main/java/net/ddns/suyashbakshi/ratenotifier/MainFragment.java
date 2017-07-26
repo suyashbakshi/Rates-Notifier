@@ -33,6 +33,7 @@ public class MainFragment extends Fragment {
 
     private RecyclerView mainList;
     private static MainListAdapter mAdapter;
+    private static AlarmManager alarmManager;
     static final int ALARM_ID = 76458;
 
     public MainFragment() {
@@ -67,9 +68,9 @@ public class MainFragment extends Fragment {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        refreshLayout.setRefreshing(false);
                     }
-                }, 3000);
-                refreshLayout.setRefreshing(false);
+                }, 2000);
             }
         });
 
@@ -84,7 +85,7 @@ public class MainFragment extends Fragment {
         if (Utility.isOnline(getContext())) {
             FetchDataService fetchDataService = new FetchDataService(mAdapter, getContext());
             fetchDataService.execute();
-            if (!isAlarmSet())
+            if (!isAlarmSet(getContext()))
                 startAlarm();
         } else {
             Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_INDEFINITE)
@@ -93,13 +94,15 @@ public class MainFragment extends Fragment {
     }
 
     public void startAlarm() {
-
+        Log.v("Alarm_check", "created");
         int refreshPeriod = 60;
 
         Intent intent = new Intent(getContext(), MyReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 getContext(), ALARM_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
+
+
+        alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                 SystemClock.elapsedRealtime(),
                 refreshPeriod * 1000,
@@ -108,23 +111,27 @@ public class MainFragment extends Fragment {
         Toast.makeText(getContext(), R.string.refresh_rate_text, Toast.LENGTH_LONG).show();
     }
 
-    public boolean isAlarmSet() {
-        Intent intent = new Intent(getActivity(), MyReceiver.class);
-        boolean isWorking = (PendingIntent.getBroadcast(getActivity(), ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null);//just changed the flag
+    public boolean isAlarmSet(Context context) {
+        Intent intent = new Intent(getContext(), MyReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                getContext(), ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE);
+        boolean isWorking = (pendingIntent != null);
         Log.d("Alarm_check", "alarm is " + (isWorking ? "" : "not") + " working...");
         return isWorking;
     }
 
     private static void stopAlarm(Context context) {
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent myIntent = new Intent(context,
-                MyReceiver.class);
+        Intent myIntent = new Intent(context, MyReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context, ALARM_ID, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        alarmManager.cancel(pendingIntent);
-        Toast.makeText(context, "Alarm Cancelled", Toast.LENGTH_SHORT).show();
+        if (alarmManager != null) {
+            alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+            pendingIntent.cancel();
+            Toast.makeText(context, "Alarm Cancelled", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static class MyReceiver extends BroadcastReceiver {

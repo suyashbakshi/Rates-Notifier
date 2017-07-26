@@ -90,24 +90,7 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
 
                             if (symbol.equalsIgnoreCase(pref_symbol) && Double.valueOf(bid) >= Double.valueOf(target_bid)) {
                                 Log.v("Bid_check", "reached");
-                                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext);
-                                mBuilder.setSmallIcon(R.drawable.dollar);
-                                mBuilder.setContentTitle("Rates Notifier");
-                                mBuilder.setContentText("Your favorite stock has reached target bid!");
-                                mBuilder.setVibrate(new long[]{0, 100, 100, 100});
-                                mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
-
-                                NotificationCompat.InboxStyle inboxStyle =
-                                        new NotificationCompat.InboxStyle();
-                                inboxStyle.setBigContentTitle("Rates Notifier");
-                                inboxStyle.setSummaryText("Your favorite stock has reached target bid!");
-                                inboxStyle.addLine(pref_symbol + "'s bid is now more than " + target_bid);
-                                mBuilder.setStyle(inboxStyle);
-
-                                NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-                                // notificationID allows you to update the notification later on.
-                                mNotificationManager.notify(1, mBuilder.build());
+                                showNotification(pref_symbol,target_bid);
                             }
 
                         } else if (myparser.getName().equalsIgnoreCase("Ask")) {
@@ -157,6 +140,27 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
         }
 
 
+    }
+
+    private void showNotification(String pref_symbol, String target_bid) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext);
+        mBuilder.setSmallIcon(R.drawable.dollar);
+        mBuilder.setContentTitle(mContext.getString(R.string.app_name));
+        mBuilder.setContentText(mContext.getString(R.string.target_reached));
+        mBuilder.setVibrate(new long[]{0, 100, 100, 100});
+        mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+
+        NotificationCompat.InboxStyle inboxStyle =
+                new NotificationCompat.InboxStyle();
+        inboxStyle.setBigContentTitle(mContext.getString(R.string.app_name));
+        inboxStyle.setSummaryText(mContext.getString(R.string.target_reached));
+        inboxStyle.addLine(pref_symbol + "'s bid is now more than " + target_bid);
+        mBuilder.setStyle(inboxStyle);
+
+        NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // notificationID allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
     }
 
     @Override
