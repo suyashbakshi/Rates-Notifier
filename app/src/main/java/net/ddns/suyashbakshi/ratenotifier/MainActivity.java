@@ -2,19 +2,17 @@ package net.ddns.suyashbakshi.ratenotifier;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.BaseTransientBottomBar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
-
-import static net.ddns.suyashbakshi.ratenotifier.R.id.symbol_tv;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,12 +20,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -39,36 +31,74 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.fav_pref), MODE_PRIVATE);
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.clear_target) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(getString(R.string.fav_pref), "");
-            editor.apply();
-            Toast.makeText(getApplicationContext(), R.string.clear_preference, Toast.LENGTH_SHORT).show();
+            clearBid(sharedPreferences);
             return true;
         } else if (id == R.id.show_bid) {
-            String pref = sharedPreferences.getString(getString(R.string.fav_pref), "");
-            if (!TextUtils.isEmpty(pref)) {
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.preference)
-                        .setMessage("Currency combination: " + pref.split("/")[0]
-                                + "\nTarget Bid: " + pref.split("/")[1])
-                        .show();
-            }
-            else{
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.preference)
-                        .setMessage(R.string.no_bid_set)
-                        .show();
-            }
+           showBid(sharedPreferences);
+        } else if (id == R.id.spinner) {
+            notifyWhenSelect();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void notifyWhenSelect() {
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),
+                R.array.options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        Spinner spinner = new Spinner(getApplicationContext());
+        spinner.setAdapter(adapter);
+
+        new AlertDialog.Builder(MainActivity.this)
+                .setView(spinner)
+                .show();
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                if(i!=0) {
+                    Log.v("spinner_check", String.valueOf(i));
+                    SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.notify_pref), MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(getString(R.string.notify_pref), String.valueOf(i));
+                    editor.apply();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+
+    private void showBid(SharedPreferences sharedPreferences) {
+        String pref = sharedPreferences.getString(getString(R.string.fav_pref), "");
+        if (!TextUtils.isEmpty(pref)) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.preference)
+                    .setMessage("Currency combination: " + pref.split("/")[0]
+                            + "\nTarget Bid: " + pref.split("/")[1])
+                    .show();
+        } else {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.preference)
+                    .setMessage(R.string.no_bid_set)
+                    .show();
+        }
+    }
+
+    private void clearBid(SharedPreferences sharedPreferences) {
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getString(R.string.fav_pref), "");
+        editor.apply();
+        Toast.makeText(getApplicationContext(), R.string.clear_preference, Toast.LENGTH_SHORT).show();
     }
 }

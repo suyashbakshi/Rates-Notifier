@@ -57,6 +57,9 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
         SharedPreferences preferences = mContext.getSharedPreferences(mContext.getString(R.string.fav_pref), Context.MODE_PRIVATE);
         String savedPref = preferences.getString(mContext.getString(R.string.fav_pref), "");
 
+        SharedPreferences preferences1 = mContext.getSharedPreferences(mContext.getString(R.string.notify_pref), Context.MODE_PRIVATE);
+        String notifyPref = preferences1.getString(mContext.getString(R.string.notify_pref),"");
+
         String pref_symbol = null, target_bid = null;
         if (!TextUtils.isEmpty(savedPref)) {
             String[] split = savedPref.split("/");
@@ -88,9 +91,28 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
                             event = myparser.next();
                             bid = myparser.getText();
 
-                            if (symbol.equalsIgnoreCase(pref_symbol) && Double.valueOf(bid) >= Double.valueOf(target_bid)) {
-                                Log.v("Bid_check", "reached");
-                                showNotification(pref_symbol,target_bid);
+                            if (symbol.equalsIgnoreCase(pref_symbol)) {
+                                Log.v("spinner_check_mtag",notifyPref);
+                                switch (notifyPref){
+                                    case "1":{
+                                        if(Double.valueOf(bid) > Double.valueOf(target_bid)){
+                                            showNotification(pref_symbol,target_bid,"more");
+                                        }
+                                        break;
+                                    }
+                                    case "2":{
+                                        if(Double.valueOf(bid) < Double.valueOf(target_bid)){
+                                            showNotification(pref_symbol,target_bid,"less");
+                                        }
+                                        break;
+                                    }
+                                    case "3":{
+                                        if(Double.valueOf(bid).compareTo(Double.valueOf(target_bid))==0){
+                                            showNotification(pref_symbol,target_bid,"equals");
+                                        }
+                                        break;
+                                    }
+                                }
                             }
 
                         } else if (myparser.getName().equalsIgnoreCase("Ask")) {
@@ -142,7 +164,7 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
 
     }
 
-    private void showNotification(String pref_symbol, String target_bid) {
+    private void showNotification(String pref_symbol, String target_bid,String level) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext);
         mBuilder.setSmallIcon(R.drawable.dollar);
         mBuilder.setContentTitle(mContext.getString(R.string.app_name));
@@ -154,7 +176,7 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
                 new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(mContext.getString(R.string.app_name));
         inboxStyle.setSummaryText(mContext.getString(R.string.target_reached));
-        inboxStyle.addLine(pref_symbol + "'s bid is now more than " + target_bid);
+        inboxStyle.addLine(pref_symbol + "'s bid is now "+ (level=="equals"?"equal to ": level +" than ") + target_bid);
         mBuilder.setStyle(inboxStyle);
 
         NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);

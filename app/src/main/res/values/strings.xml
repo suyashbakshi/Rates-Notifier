@@ -13,4 +13,14 @@
     <string name="no_bid_set">No target bid set</string>
     <string name="no_internet">Uh oh! No internet...</string>
     <string name="target_reached">Your favorite stock has reached target bid!</string>
+
+    <string name="prompt">Notify When</string>
+    <string name="notify_pref">notifyPref</string>
+
+    <string-array name="options">
+        <item>Notify When:</item>
+        <item>Current bid is more than target bid</item>
+        <item>Current bid is less than target bid</item>
+        <item>Current bid equals target bid</item>
+    </string-array>
 </resources>
