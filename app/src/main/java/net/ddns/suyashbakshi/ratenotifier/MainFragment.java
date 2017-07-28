@@ -44,13 +44,14 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
+
         mAdapter = new MainListAdapter(new ArrayList<String>(), getContext());
 
         mainList = (RecyclerView) rootView.findViewById(R.id.main_list);
         mainList.setLayoutManager(new LinearLayoutManager(getActivity()));
         mainList.setAdapter(mAdapter);
         registerForContextMenu(mainList);
-
         mainList.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View view, int i, int i1, int i2, int i3) {
@@ -59,7 +60,6 @@ public class MainFragment extends Fragment {
             }
         });
 
-        final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

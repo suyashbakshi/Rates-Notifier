@@ -50,7 +50,6 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         String[] split = mList.get(position).split("/");
-        Log.v("Test_data", mList.get(position) + " " + split[0] + " " + split[1] + " " + split[2] + " " + split[3] + " " + split[4] + " ");
         holder.symbol_tv.setText(split[0]);
         holder.bid_tv.setText("Bid: " + split[1]);
         holder.ask_tv.setText("Ask: " + split[2]);
@@ -118,7 +117,7 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
                                     if (TextUtils.isEmpty(targetBid))
                                         return;
                                     else if (!targetBid.matches("\\d+(?:\\.\\d+)?")) {
-                                        Toast.makeText(mContext, "Invalid input, only integers allowed", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(mContext, R.string.invalid_data, Toast.LENGTH_SHORT).show();
                                         return;
                                     }
                                     SharedPreferences sharedPreferences = mContext.getSharedPreferences(mContext.getString(R.string.fav_pref), mContext.MODE_PRIVATE);
@@ -139,6 +138,5 @@ public class MainListAdapter extends RecyclerView.Adapter<MainListAdapter.ViewHo
                 }
             });
         }
-
     }
 }

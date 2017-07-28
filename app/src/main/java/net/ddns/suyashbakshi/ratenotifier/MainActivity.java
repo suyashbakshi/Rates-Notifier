@@ -52,8 +52,11 @@ public class MainActivity extends AppCompatActivity {
                 R.array.options, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        final SharedPreferences[] sharedPreferences = {getSharedPreferences(getString(R.string.notify_pref), MODE_PRIVATE)};
+
         Spinner spinner = new Spinner(getApplicationContext());
         spinner.setAdapter(adapter);
+        spinner.setSelection(Integer.parseInt(sharedPreferences[0].getString(getString(R.string.notify_pref),"0")));
 
         new AlertDialog.Builder(MainActivity.this)
                 .setView(spinner)
@@ -64,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if(i!=0) {
                     Log.v("spinner_check", String.valueOf(i));
-                    SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.notify_pref), MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    sharedPreferences[0] = getSharedPreferences(getString(R.string.notify_pref), MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences[0].edit();
                     editor.putString(getString(R.string.notify_pref), String.valueOf(i));
                     editor.apply();
                 }

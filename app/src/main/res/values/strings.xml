@@ -16,6 +16,7 @@
 
     <string name="prompt">Notify When</string>
     <string name="notify_pref">notifyPref</string>
+    <string name="invalid_data">Invalid input, only integers allowed</string>
 
     <string-array name="options">
         <item>Notify When:</item>

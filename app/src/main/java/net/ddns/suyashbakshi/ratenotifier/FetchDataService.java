@@ -37,17 +37,38 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
     }
 
     @Override
+    protected String doInBackground(Void... voids) {
+
+        if (mAdapter != null) {
+            mAdapter.clear();
+        }
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("http://rates.fxcm.com/RatesXML")
+                .build();
+
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+            return response.body().string();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    @Override
     protected void onPostExecute(String xml) {
         super.onPostExecute(xml);
-
         if (TextUtils.isEmpty(xml)) {
             Toast.makeText(mContext, R.string.no_data, Toast.LENGTH_LONG).show();
             return;
         }
-
         convertXMLToUXFormat(mAdapter, xml);
         mAdapter.notifyDataSetChanged();
-        Log.v("Check_insert", String.valueOf(mAdapter.getItemCount()));
 
 
     }
@@ -58,7 +79,7 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
         String savedPref = preferences.getString(mContext.getString(R.string.fav_pref), "");
 
         SharedPreferences preferences1 = mContext.getSharedPreferences(mContext.getString(R.string.notify_pref), Context.MODE_PRIVATE);
-        String notifyPref = preferences1.getString(mContext.getString(R.string.notify_pref),"");
+        String notifyPref = preferences1.getString(mContext.getString(R.string.notify_pref), "");
 
         String pref_symbol = null, target_bid = null;
         if (!TextUtils.isEmpty(savedPref)) {
@@ -92,23 +113,23 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
                             bid = myparser.getText();
 
                             if (symbol.equalsIgnoreCase(pref_symbol)) {
-                                Log.v("spinner_check_mtag",notifyPref);
-                                switch (notifyPref){
-                                    case "1":{
-                                        if(Double.valueOf(bid) > Double.valueOf(target_bid)){
-                                            showNotification(pref_symbol,target_bid,"more");
+                                Log.v("spinner_check_mtag", notifyPref);
+                                switch (notifyPref) {
+                                    case "1": {
+                                        if (Double.valueOf(bid) > Double.valueOf(target_bid)) {
+                                            showNotification(pref_symbol, target_bid, "more");
                                         }
                                         break;
                                     }
-                                    case "2":{
-                                        if(Double.valueOf(bid) < Double.valueOf(target_bid)){
-                                            showNotification(pref_symbol,target_bid,"less");
+                                    case "2": {
+                                        if (Double.valueOf(bid) < Double.valueOf(target_bid)) {
+                                            showNotification(pref_symbol, target_bid, "less");
                                         }
                                         break;
                                     }
-                                    case "3":{
-                                        if(Double.valueOf(bid).compareTo(Double.valueOf(target_bid))==0){
-                                            showNotification(pref_symbol,target_bid,"equals");
+                                    case "3": {
+                                        if (Double.valueOf(bid).compareTo(Double.valueOf(target_bid)) == 0) {
+                                            showNotification(pref_symbol, target_bid, "equals");
                                         }
                                         break;
                                     }
@@ -146,7 +167,7 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
                         break;
                     }
                     case XmlPullParser.END_DOCUMENT: {
-                        Log.v("Start document", "");
+                        Log.v("End document", "");
                         break;
                     }
                 }
@@ -154,17 +175,15 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
             }
 
         } catch (UnsupportedEncodingException e) {
-
+            e.printStackTrace();
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
-    private void showNotification(String pref_symbol, String target_bid,String level) {
+    private void showNotification(String pref_symbol, String target_bid, String level) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext);
         mBuilder.setSmallIcon(R.drawable.dollar);
         mBuilder.setContentTitle(mContext.getString(R.string.app_name));
@@ -176,36 +195,11 @@ public class FetchDataService extends AsyncTask<Void, Void, String> {
                 new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(mContext.getString(R.string.app_name));
         inboxStyle.setSummaryText(mContext.getString(R.string.target_reached));
-        inboxStyle.addLine(pref_symbol + "'s bid is now "+ (level=="equals"?"equal to ": level +" than ") + target_bid);
+        inboxStyle.addLine(pref_symbol + "'s bid is now " + (level == "equals" ? "equal to " : level + " than ") + target_bid);
         mBuilder.setStyle(inboxStyle);
 
         NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
         // notificationID allows you to update the notification later on.
         mNotificationManager.notify(1, mBuilder.build());
-    }
-
-    @Override
-    protected String doInBackground(Void... voids) {
-
-        if (mAdapter != null) {
-            mAdapter.clear();
-        }
-
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("http://rates.fxcm.com/RatesXML")
-                .build();
-
-        Response response = null;
-        try {
-            response = client.newCall(request).execute();
-            return response.body().string();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-
     }
 }
